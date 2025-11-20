@@ -1,4 +1,5 @@
 import streamlit as st
+import nest_asyncio
 import asyncio
 import edge_tts
 import base64
@@ -8,6 +9,8 @@ from pypinyin import pinyin, Style
 from gtts import gTTS
 
 
+
+nest_asyncio.apply()
 # Page Config
 st.set_page_config(page_title="Mandarin Karaoke Pro", layout="wide")
 
