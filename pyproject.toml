@@ -7,5 +7,6 @@ requires-python = ">=3.11"
 dependencies = [
     "edge-tts>=7.2.3",
     "jieba>=0.42.1",
+    "pypinyin>=0.55.0",
     "streamlit>=1.51.0",
 ]
