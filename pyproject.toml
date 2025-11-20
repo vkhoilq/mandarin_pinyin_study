@@ -8,6 +8,7 @@ dependencies = [
     "asyncio>=4.0.0",
     "edge-tts>=7.2.3",
     "jieba>=0.42.1",
+    "nest-asyncio>=1.6.0",
     "pypinyin>=0.55.0",
     "streamlit>=1.51.0",
 ]
