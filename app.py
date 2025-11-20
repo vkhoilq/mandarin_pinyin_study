@@ -5,6 +5,8 @@ import base64
 import jieba
 from io import BytesIO
 from pypinyin import pinyin, Style
+from gtts import gTTS
+
 
 # Page Config
 st.set_page_config(page_title="Mandarin Karaoke Pro", layout="wide")
@@ -63,13 +65,41 @@ def get_karaoke_data(text):
 
 
 async def get_audio_base64(text, voice, rate):
-    communicate = edge_tts.Communicate(text, voice, rate=rate)
-    audio_buffer = BytesIO()
-    async for chunk in communicate.stream():
-        if chunk["type"] == "audio":
-            audio_buffer.write(chunk["data"])
-    audio_buffer.seek(0)
-    b64 = base64.b64encode(audio_buffer.read()).decode()
+    mp3_fp = BytesIO()
+
+    try:
+        # --- ATTEMPT 1: Edge TTS (High Quality) ---
+        # Note: edge-tts doesn't like empty strings, check first
+        if not text.strip():
+            raise ValueError("Text is empty")
+
+        communicate = edge_tts.Communicate(text, voice, rate=rate)
+        async for chunk in communicate.stream():
+            if chunk["type"] == "audio":
+                mp3_fp.write(chunk["data"])
+
+        # Check if we actually got data
+        if mp3_fp.getbuffer().nbytes == 0:
+            raise Exception("EdgeTTS returned 0 bytes (IP Blocked?)")
+
+    except Exception as e:
+        # --- ATTEMPT 2: Fallback to Google TTS (Standard Quality) ---
+        # Log the error to your console so you know it happened
+        print(f"⚠️ EdgeTTS failed: {e}. Switching to Google Backup.")
+
+        # Reset buffer just in case
+        mp3_fp = BytesIO()
+
+        # gTTS doesn't support specific voices/speed the same way
+        # We use 'zh-cn' for Mandarin
+        tts = gTTS(text=text, lang="zh-cn")
+        tts.write_to_fp(mp3_fp)
+
+        # Notify user in UI (Optional)
+        st.toast("Using Backup Voice (Microsoft Service Busy)", icon="⚠️")
+
+    mp3_fp.seek(0)
+    b64 = base64.b64encode(mp3_fp.read()).decode()
     return f"data:audio/mp3;base64,{b64}"
 
 
