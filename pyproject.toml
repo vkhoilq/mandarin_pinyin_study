@@ -1,0 +1,11 @@
+[project]
+name = "pinyin-converter"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "edge-tts>=7.2.3",
+    "jieba>=0.42.1",
+    "streamlit>=1.51.0",
+]
